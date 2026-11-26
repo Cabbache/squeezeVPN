@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- the only files other apps may open (videos, audio, documents tapped in a chat) -->
+<paths>
+    <files-path name="media" path="media/" />
+</paths>

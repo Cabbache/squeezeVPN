@@ -1,0 +1,13 @@
+This is a fork of the `tunnel` module of wireguard-android
+(https://git.zx2c4.com/wireguard-android, tag 1.0.20260102, commit 09b75c2bd37f749e2a8c85876394854113c74be7),
+licensed under the Apache License 2.0 (see COPYING). wireguard-go is MIT licensed.
+
+Changes made for squeezeVPN:
+- tools/libwg-go/mark/ (new): marks connections of apps whose traffic the server leaves untouched
+  (source 10.8.0.2 -> 10.8.0.3, replies back), asking the app once per new connection.
+- tools/libwg-go/api-android.go: wraps the tun device with mark.New; plainFlow() calls into jni.c.
+- tools/libwg-go/jni.c: JNI_OnLoad keeps the JavaVM; svpn_plain() calls GoBackend.plainFlow().
+- tools/libwg-go/Makefile: rebuilds when the Go/C sources change, not only go.mod.
+- GoBackend.java: setUidFilter() / UidFilter, plainFlow() (ConnectivityManager.getConnectionOwnerUid).
+- Removed: WgQuickBackend, RootShell, ToolsInstaller, libwg.so / libwg-quick.so (root only),
+  tests, publishing and signing; build.gradle.kts and tools/CMakeLists.txt rewritten for this project.

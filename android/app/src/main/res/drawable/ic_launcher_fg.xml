@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A squeezed sponge with drops falling out ("squeeze the data"). 108dp canvas; the group scales the
+     artwork into the 66dp safe zone. The pores are holes (even-odd), so the themed (monochrome) icon
+     keeps them. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:pivotX="54"
+        android:pivotY="55.5"
+        android:scaleX="0.8"
+        android:scaleY="0.8">
+        <path
+            android:fillColor="#F7C948"
+            android:fillType="evenOdd"
+            android:pathData="M34,26 L74,26 Q79,26 79,31 C79,38 66,41 66,47 C66,53 79,56 79,63 Q79,68 74,68 L34,68 Q29,68 29,63 C29,56 42,53 42,47 C42,41 29,38 29,31 Q29,26 34,26 Z M37.8,32 a2.2,2.2 0 1,0 4.4,0 a2.2,2.2 0 1,0 -4.4,0 Z M49,33.5 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 Z M62,31 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0 Z M68.4,36 a1.6,1.6 0 1,0 3.2,0 a1.6,1.6 0 1,0 -3.2,0 Z M44.2,39 a1.8,1.8 0 1,0 3.6,0 a1.8,1.8 0 1,0 -3.6,0 Z M57,40 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0 Z M42,56 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0 Z M54.2,54 a1.8,1.8 0 1,0 3.6,0 a1.8,1.8 0 1,0 -3.6,0 Z M62.4,59 a2.6,2.6 0 1,0 5.2,0 a2.6,2.6 0 1,0 -5.2,0 Z M35.7,63 a1.8,1.8 0 1,0 3.6,0 a1.8,1.8 0 1,0 -3.6,0 Z M48,62 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 Z M68.4,64 a1.6,1.6 0 1,0 3.2,0 a1.6,1.6 0 1,0 -3.2,0 Z" />
+        <path
+            android:fillColor="#8FD3FF"
+            android:pathData="M43,71.5 C43,71.5 40,76.2 40,78 A3,3 0 0,0 46,78 C46,76.2 43,71.5 43,71.5 Z M54,71 C54,71 49.5,77.3 49.5,80 A4.5,4.5 0 0,0 58.5,80 C58.5,77.3 54,71 54,71 Z M65,71.5 C65,71.5 62,76.2 62,78 A3,3 0 0,0 68,78 C68,76.2 65,71.5 65,71.5 Z" />
+    </group>
+</vector>

@@ -1,0 +1,42 @@
+[package]
+name = "svpn"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+whatsapp-rust = { git = "https://github.com/oxidezap/whatsapp-rust", rev = "f1e70748733f783670f1e43707fe645d1ea10737" }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "io-util", "sync", "time", "fs", "signal"] }
+qr2term = "0.3"
+chacha20poly1305 = "0.10"
+zstd = { version = "0.13", features = ["zdict_builder", "experimental"] }
+hkdf = "0.12"
+sha2 = "0.10"
+hyper = { version = "1", features = ["http1", "http2", "server", "client"] }
+hyper-util = { version = "0.1", features = ["tokio", "server-auto", "http1", "http2"] }
+http-body-util = "0.1"
+bytes = "1"
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp"] }
+webp = { version = "0.3.1", default-features = false }
+x25519-dalek = { version = "2", features = ["static_secrets"] }
+rand = "0.8"
+base64 = "0.22"
+anyhow = "1"
+log = "0.4"
+env_logger = "0.11"
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"
+boringtun = { version = "0.7.1", default-features = false }
+ipstack = "1.0.1"
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"] }
+tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12", "logging"] }
+webpki-roots = "1"
+time = "0.3"
+rcgen = { version = "0.14", default-features = false, features = ["crypto", "pem", "ring", "x509-parser"] }
+# Signal linked device (AGPL-3.0). The store is vendored only to share SQLite 0.40 with whatsapp-rust
+# (see vendor/presage-store-sqlite/Cargo.toml); no sqlcipher, no CDSI (so no BoringSSL).
+presage = { git = "https://github.com/whisperfish/presage", rev = "7a5c2c723cf92b9c6abf39b169e4368e07d2165b", default-features = false }
+presage-store-sqlite = { path = "vendor/presage-store-sqlite", default-features = false }
+futures = "0.3"
+
+[dev-dependencies]
+etherparse = "0.20"
