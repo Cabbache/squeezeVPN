@@ -17,6 +17,16 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     testOptions { unitTests.isReturnDefaultValues = true }
+    // Release signing from the environment (CI variables); without them the release APK is unsigned.
+    System.getenv("SIGNING_KEYSTORE")?.takeIf { it.isNotEmpty() }?.let { ks ->
+        signingConfigs.create("release") {
+            storeFile = file(ks)
+            storePassword = System.getenv("SIGNING_STORE_PASSWORD")
+            keyAlias = System.getenv("SIGNING_KEY_ALIAS")
+            keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
+        }
+        buildTypes.getByName("release").signingConfig = signingConfigs.getByName("release")
+    }
 }
 
 dependencies {

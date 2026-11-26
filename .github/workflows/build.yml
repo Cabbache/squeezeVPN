@@ -1,0 +1,97 @@
+# Builds the server for x86_64 and ARM64 Linux and the Android app in release mode.
+# The server is built on Debian 12 (glibc 2.36), so it also runs on servers with an older distro.
+#
+# Release signing (optional), repository secrets: SIGNING_KEYSTORE_BASE64 (the keystore file, base64),
+# SIGNING_STORE_PASSWORD, SIGNING_KEY_ALIAS, SIGNING_KEY_PASSWORD. Without them the APK is unsigned.
+name: build
+
+on:
+  push:
+    branches: [main, master]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  server:
+    runs-on: ubuntu-latest
+    container: rust:1-bookworm
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            cross: ""
+          - target: aarch64-unknown-linux-gnu
+            cross: aarch64-linux-gnu
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            /usr/local/cargo/registry
+            /usr/local/cargo/git
+          key: cargo-${{ matrix.target }}-${{ hashFiles('server/Cargo.lock') }}
+          restore-keys: cargo-${{ matrix.target }}-
+      - name: Install build tools
+        env:
+          TARGET: ${{ matrix.target }}
+          CROSS: ${{ matrix.cross }}
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq --no-install-recommends protobuf-compiler cmake clang libclang-dev
+          if [ -n "$CROSS" ]; then
+            apt-get install -y -qq --no-install-recommends gcc-$CROSS g++-$CROSS libc6-dev-arm64-cross
+            T=$(echo "$TARGET" | tr 'a-z-' 'A-Z_')
+            t=$(echo "$TARGET" | tr '-' '_')
+            { echo "CARGO_TARGET_${T}_LINKER=$CROSS-gcc"; echo "CC_$t=$CROSS-gcc"
+              echo "CXX_$t=$CROSS-g++"; echo "AR_$t=$CROSS-ar"; } >> "$GITHUB_ENV"
+          fi
+          rustup target add "$TARGET"
+      - name: Build
+        working-directory: server
+        run: |
+          cargo build --release --locked --target ${{ matrix.target }}
+          cp target/${{ matrix.target }}/release/svpn svpn-${{ matrix.target }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: svpn-${{ matrix.target }}
+          path: server/svpn-${{ matrix.target }}
+
+  app:
+    runs-on: ubuntu-latest
+    env:
+      KEYSTORE: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ hashFiles('android/**/*.kts', 'android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: gradle-
+      - name: Install NDK and CMake
+        run: |
+          sdk="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          (yes || true) | "$sdk" --licenses > /dev/null # yes ends with SIGPIPE
+          "$sdk" "platforms;android-36" "ndk;30.0.16248370" "cmake;4.1.2" > /dev/null
+      - name: Signing key
+        if: env.KEYSTORE != ''
+        run: |
+          echo "$KEYSTORE" | base64 -d > "$RUNNER_TEMP/release.jks"
+          echo "SIGNING_KEYSTORE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+      - name: Build release APK
+        working-directory: android
+        env:
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: ./gradlew --no-daemon assembleRelease
+      - uses: actions/upload-artifact@v4
+        with:
+          name: squeezeVPN-apk
+          path: android/app/build/outputs/apk/release/*.apk
